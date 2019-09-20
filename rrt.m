@@ -112,6 +112,7 @@ while(1)
         if(testDist < minDistance)
             x = nodeList(index, 1);
             y = nodeList(index, 2);
+            minDistance = testDist;
         end
     end
     
@@ -132,6 +133,9 @@ while(1)
     adjacencyList = [adjacencyList; x y randX randY];
     nodeList = [nodeList; randX randY;];
     
+    fg = figure(101);
+    t1 = text(randX, randY, 'P'); set(t1,'Color','w','Fontsize',15);
+
     
     % Display intermittently - assumes that student plots the graph
     if ~mod(ct,200)
@@ -154,18 +158,18 @@ backTrace = [adjacencyList(adjRowSize, 3) adjacencyList(adjRowSize, 4) adjacency
 index = adjRowSize - 1;
 backIndex = 1;
 
-while index > 0
-    
-    while(backTrace(backIndex, 3) ~= adjacencyList(index, 3) && backTrace(backIndex, 4) == adjacencyList(index, 4))
-        index = index -1;
+for index = adjRowSize: -1: 1
+    if (backTrace(backIndex, 3) == adjacencyList(index, 3) && backTrace(backIndex, 4) == adjacencyList(index, 4))
+        backTrace = [backTrace; adjacencyList(index, 3) adjacencyList(index, 4) adjacencyList(index, 1) adjacencyList(index, 2);];
+        backIndex = backIndex + 1;    
     end
-    
-    backTrace = [backTrace; adjacencyList(index, 3) adjacencyList(index, 4) adjacencyList(index, 1) adjacencyList(index, 2);];
-    index = index -1;
 end
 
+traceSize = size(backTrace(1));
 
-
+for index = 1: traceSize(2)
+    en = plot([backTrace(index, 1) backTrace(index, 3)], [backTrace(index, 2) backTrace(index, 4)]); set(en, 'Color', 'w'); set(en, 'Linewidth', 2);
+end
 % Draw a final time before exiting
 figure(fg);
 plot(fpath(:,1), fpath(:,2), 'k.-', 'Linewidth',2);

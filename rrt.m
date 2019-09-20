@@ -72,6 +72,15 @@ while(1)
     % Extend graph towards sample by deltaStep to get xnew (check for path collision)
     % Add xnew to graph, do some display (intermittently)
     % Check for reaching goal & repeat
+    x = 1;
+    xx = 2;
+    y = 4;
+    yy = 4;
+    
+    randX = randi([1 9]);
+    randY = randi([1 9]);
+    
+    disp(adjList);
     if randValue == 1
     end
     % Display intermittently - assumes that student plots the graph

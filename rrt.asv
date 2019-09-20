@@ -11,8 +11,7 @@ function[fpath, cost] = rrt(envmap, start, goal, deltaStep)
 % OUTPUTS:
 % fpath     - Final collision-free path (N x 2, each row is [x,y])
 % cost      - Cost of the final path (sum of squared distances between nodes on the path)
-mapSize = size(envmap); 
-display(mapSize[1]);
+
 
 if nargin < 3
     error('Need to pass in map, start and goal');
@@ -59,6 +58,11 @@ ylim([1,size(envmap,1)]);
 % (x,y) = (col,row) in MATLAB sense
 % 
 ct = 0;
+
+mapSize = size(envmap); 
+rowSize = mapSize(1)
+colSize = mapSize(2)
+
 while(1)
     randValue = randi([1 100]);
     
@@ -68,7 +72,17 @@ while(1)
     % Extend graph towards sample by deltaStep to get xnew (check for path collision)
     % Add xnew to graph, do some display (intermittently)
     % Check for reaching goal & repeat
+    x = 1;
+    xx = 2;
+    y = 4;
+    yy = 4;
     
+    randX = randi([1 9]);
+    randY = randi([1 9]);
+    
+    disp(adjList);
+    if randValue == 1
+    end
     % Display intermittently - assumes that student plots the graph
     if ~mod(ct,200)
         figure(fg);

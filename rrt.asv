@@ -60,11 +60,39 @@ ylim([1,size(envmap,1)]);
 ct = 0;
 
 mapSize = size(envmap); 
-rowSize = mapSize(1)
-colSize = mapSize(2)
+rowSize = mapSize(1);
+colSize = mapSize(2);
+
+adjacencyList = [];
+nodeList = [start(1) start(2)];
+breakFlag = 0;
 
 while(1)
-    randValue = randi([1 100]);
+    
+    nSize = size(nodeList);
+    nodeListSize = nSize(1);
+    
+    goalProb = randi([1 100]);
+    
+    
+    if goalProb == 1
+        for index = 1:nodeListSize
+            startGoal = [goal(1) goal(2)];
+            testNode = [nodeList(index, 1) nodeList(index,2)];
+            testX = nodeList(index, 1);
+            testY = nodeList(index, 2);
+            
+            if(distance(testX, testY, goal(1), goal(2)) < 10 && collcheckstline(envmap, testNode, startGoal))
+               adjacencyList = [adjacencyList; nodeList(index, 1) nodeList(index, 2) goal(1) goal(2)];
+               breakFlag = 1;
+               break
+            end
+        end  
+    end
+    
+    if breakFlag == 1
+        break
+    end
     
     % TODO: Run till goal is reached
     % Sample random state (sample goal with 1% prob)
@@ -72,17 +100,47 @@ while(1)
     % Extend graph towards sample by deltaStep to get xnew (check for path collision)
     % Add xnew to graph, do some display (intermittently)
     % Check for reaching goal & repeat
+    randX = randi([1 colSize]);
+    randY = randi([1 rowSize]);
+    
     x = 1;
-    xx = 2;
-    y = 4;
-    yy = 4;
+    y = 1;
     
-    randX = randi([1 9]);
-    randY = randi([1 9]);
-    
-    disp(adjList);
-    if randValue == 1
+    minDistance = distance(1, 1, rowSize, colSize);
+    for index = 1:nodeListSize
+        testDist = distance(nodeList(index,1), nodeList(index,2), randX, randY);
+        if(testDist <= minDistance)
+            x = nodeList(index, 1);
+            y = nodeList(index, 2);
+            minDistance = testDist;
+        end
     end
+    
+    dist = round(distance(x, y, randX, randY));
+    if dist > deltaStep
+        
+        while dist > randX && dist > rand
+            
+        end
+        = dist/deltaStep;
+        
+        randX = round(randX/changeNum);
+        randY = round(randY/changeNum);
+    end
+    
+    startPoint = [x y];
+    endPoint = [randX randY];
+    disp(startPoint);
+    disp(endPoint);
+    if not(collcheckstline(envmap,startPoint, endPoint))
+        continue;
+    end
+    
+    t3 = plot(randX, randY, 'w*'); set(t3,'Color','w');
+    
+    adjacencyList = [adjacencyList; x y randX randY];
+    nodeList = [nodeList; randX randY;];    
+
     % Display intermittently - assumes that student plots the graph
     if ~mod(ct,200)
         figure(fg);
@@ -96,6 +154,24 @@ end
 % TODO: Backtrack to find the path between start & goal as well as the cost of the path
 % You need to set variables fpath & cost
 
+adjSize = size(adjacencyList);
+adjRowSize = adjSize(1);
+
+fpath = [adjacencyList(adjRowSize, 3) adjacencyList(adjRowSize, 4) adjacencyList(adjRowSize, 1) adjacencyList(adjRowSize, 2)];
+backIndex = 1;
+
+for index = adjRowSize: -1: 1
+    if (fpath(backIndex, 3) == adjacencyList(index, 3) && fpath(backIndex, 4) == adjacencyList(index, 4))
+        fpath = [fpath; adjacencyList(index, 3) adjacencyList(index, 4) adjacencyList(index, 1) adjacencyList(index, 2);];
+        backIndex = backIndex + 1;    
+    end
+end
+
+traceSize = size(fpath);
+
+for index = 1: traceSize(1)
+    en = plot([fpath(index, 1) fpath(index, 3)], [fpath(index, 2) fpath(index, 4)]); set(en, 'Color', 'w'); set(en, 'Linewidth', 2);
+end
 % Draw a final time before exiting
 figure(fg);
 plot(fpath(:,1), fpath(:,2), 'k.-', 'Linewidth',2);

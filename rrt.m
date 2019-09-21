@@ -103,13 +103,13 @@ while(1)
     randX = randi([1 colSize]);
     randY = randi([1 rowSize]);
     
-    x = 0;
-    y = 0;
+    x = 1;
+    y = 1;
     
     minDistance = distance(1, 1, rowSize, colSize);
     for index = 1:nodeListSize
         testDist = distance(nodeList(index,1), nodeList(index,2), randX, randY);
-        if(testDist < minDistance)
+        if(testDist <= minDistance)
             x = nodeList(index, 1);
             y = nodeList(index, 2);
             minDistance = testDist;
@@ -118,25 +118,33 @@ while(1)
     
     dist = round(distance(x, y, randX, randY));
     if dist > deltaStep
-        changeNum = dist/deltaStep;
-        randX = round(randX/changeNum);
-        randY = round(randY/changeNum);
+        
+        dist = dist/deltaStep;
+        dist = dist * (10/dist);
+        %randX = round(randX/dist);
+        %randY = round(randY/dist);
+        randX = round(x + dist);
+        randY = round(y+dist);   
+    end
+    if randX > colSize
+        randX = colSize;
     end
     
+    if randY > rowSize
+        randY = rowSize;
+    end
     startPoint = [x y];
     endPoint = [randX randY];
-    
     if not(collcheckstline(envmap,startPoint, endPoint))
         continue;
     end
+    disp(randX);
+    disp(randY);
+    t3 = plot(randX, randY, 'w*'); set(t3,'Color','w');
     
     adjacencyList = [adjacencyList; x y randX randY];
-    nodeList = [nodeList; randX randY;];
-    
-    fg = figure(101);
-    t1 = text(randX, randY, 'P'); set(t1,'Color','w','Fontsize',15);
+    nodeList = [nodeList; randX randY;];    
 
-    
     % Display intermittently - assumes that student plots the graph
     if ~mod(ct,200)
         figure(fg);
@@ -152,23 +160,21 @@ end
 
 adjSize = size(adjacencyList);
 adjRowSize = adjSize(1);
-adjColSize = adjSize(2);
 
-backTrace = [adjacencyList(adjRowSize, 3) adjacencyList(adjRowSize, 4) adjacencyList(adjRowSize, 1) adjacencyList(adjRowSize, 2)];
-index = adjRowSize - 1;
+fpath = [adjacencyList(adjRowSize, 3) adjacencyList(adjRowSize, 4) adjacencyList(adjRowSize, 1) adjacencyList(adjRowSize, 2)];
 backIndex = 1;
 
 for index = adjRowSize: -1: 1
-    if (backTrace(backIndex, 3) == adjacencyList(index, 3) && backTrace(backIndex, 4) == adjacencyList(index, 4))
-        backTrace = [backTrace; adjacencyList(index, 3) adjacencyList(index, 4) adjacencyList(index, 1) adjacencyList(index, 2);];
+    if (fpath(backIndex, 3) == adjacencyList(index, 3) && fpath(backIndex, 4) == adjacencyList(index, 4))
+        fpath = [fpath; adjacencyList(index, 3) adjacencyList(index, 4) adjacencyList(index, 1) adjacencyList(index, 2);];
         backIndex = backIndex + 1;    
     end
 end
 
-traceSize = size(backTrace(1));
+traceSize = size(fpath);
 
-for index = 1: traceSize(2)
-    en = plot([backTrace(index, 1) backTrace(index, 3)], [backTrace(index, 2) backTrace(index, 4)]); set(en, 'Color', 'w'); set(en, 'Linewidth', 2);
+for index = 1: traceSize(1)
+    en = plot([fpath(index, 1) fpath(index, 3)], [fpath(index, 2) fpath(index, 4)]); set(en, 'Color', 'w'); set(en, 'Linewidth', 2);
 end
 % Draw a final time before exiting
 figure(fg);

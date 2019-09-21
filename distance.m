@@ -18,13 +18,13 @@
 %can fit a function based on the cost of actual forward propagations you do. 
 %  c) You could also use the length of the car (= 7.5 cells in the current setup, 
 % check simulate_carBot.m) to better inform your distance metric. 
-function d = distance(a, b)
+function d = distance(x, y, xx, yy)
 % INPUT:
 % a - set of input poses [x,y,theta] => (N x 3), N can be >= 1
 % b - single pose [x,y,theta] => (1 x 3)
 % OUTPUT:
 % d - distance between states (scalar or (Nx1) vector)
 
-d = zeros(size(a,1));
+d = sqrt((x-xx)^2 + (y-yy)^2);
 
 end

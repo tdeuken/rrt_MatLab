@@ -117,24 +117,12 @@ while(1)
     end
     
     dist = round(distance(x, y, randX, randY));
-    if dist > deltaStep
-        
-        dist = dist/deltaStep;
-        dist = dist * (10/dist);
-        %randX = round(randX/dist);
-        %randY = round(randY/dist);
-        randX = round(x + dist);
-        randY = round(y+dist);   
-    end
-    if randX > colSize
-        randX = colSize;
-    end
     
-    if randY > rowSize
-        randY = rowSize;
-    end
-    
-    
+    while dist > deltaStep
+        randX = (x + randX)/2;
+        randY = (y + randY)/2;
+        dist = round(distance(x,y, randX, randY));
+    end   
         
     for k = 1:nodeListSize
         if nodeList(k,1) == randX && nodeList(k,2) == randY
@@ -150,7 +138,7 @@ while(1)
     end
     disp(randX);
     disp(randY);
-    t3 = plot(randX, randY, 'w*'); set(t3,'Color','w');
+    t3 = plot([x randX], [y randY]); set(t3, 'Color', 'r'); set(t3, 'Linewidth', 2); 
     
     adjacencyList = [adjacencyList; x y randX randY];
     nodeList = [nodeList; randX randY;];    

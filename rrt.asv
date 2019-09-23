@@ -117,26 +117,28 @@ while(1)
     end
     
     dist = round(distance(x, y, randX, randY));
-    if dist > deltaStep
+    
+    while dist > deltaStep
+        randX = (x + randX)/2;
+        randY = (y + randY)/2;
+        dist = round(distance(x,y, randX, randY));
+    end   
         
-        while dist > randX && dist > rand
-            
+    for k = 1:nodeListSize
+        if nodeList(k,1) == randX && nodeList(k,2) == randY
+            continue
         end
-        = dist/deltaStep;
-        
-        randX = round(randX/changeNum);
-        randY = round(randY/changeNum);
     end
+    
     
     startPoint = [x y];
     endPoint = [randX randY];
-    disp(startPoint);
-    disp(endPoint);
     if not(collcheckstline(envmap,startPoint, endPoint))
         continue;
     end
-    
-    t3 = plot(randX, randY, 'w*'); set(t3,'Color','w');
+    disp(randX);
+    disp(randY);
+    t3 = plot(;
     
     adjacencyList = [adjacencyList; x y randX randY];
     nodeList = [nodeList; randX randY;];    

@@ -136,8 +136,7 @@ while(1)
     if not(collcheckstline(envmap,startPoint, endPoint))
         continue;
     end
-    disp(randX);
-    disp(randY);
+  
     t3 = plot([x randX], [y randY]); set(t3, 'Color', 'r'); set(t3, 'Linewidth', 2); 
     
     adjacencyList = [adjacencyList; x y randX randY];

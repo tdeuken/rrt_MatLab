@@ -124,6 +124,12 @@ while(1)
     % Choose xnew that is closest to sample
     % Add xnew to graph, do some display (intermittently)
     % Check for reaching goal & repeat
+    randX = randi([1 400]);
+    randY = randi([1 400]);
+    randZ = randi([1 400]);
+    
+    
+    
     
     % Update figure - assumes student does something interesting to display
     if(~mod(ct,150))

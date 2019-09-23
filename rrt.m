@@ -133,6 +133,16 @@ while(1)
     if randY > rowSize
         randY = rowSize;
     end
+    
+    
+        
+    for k = 1:nodeListSize
+        if nodeList(k,1) == randX && nodeList(k,2) == randY
+            continue
+        end
+    end
+    
+    
     startPoint = [x y];
     endPoint = [randX randY];
     if not(collcheckstline(envmap,startPoint, endPoint))

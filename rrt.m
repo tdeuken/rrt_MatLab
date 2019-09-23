@@ -1,0 +1,182 @@
+function[fpath, cost] = rrt(envmap, start, goal, deltaStep)
+% Implements the RRT motion planner for a point-robot to find a
+% collision-free path from start to goal
+% INPUTS:
+% envmap    - Map of the environment, envmap(y,x) = 1 means the cell
+%           (x,y) is an obstacle, envmap(y,x) = 0 means it is free
+% start     - Robot start [x,y] = [col,row]
+% goal      - Robot goal [x,y] = [col,row]
+% deltaStep - (Optional) Approx. number of cells by which to extend the graph in
+%             direction of the nearest-neigbour on the graph (Default: 10)
+% OUTPUTS:
+% fpath     - Final collision-free path (N x 2, each row is [x,y])
+% cost      - Cost of the final path (sum of squared distances between nodes on the path)
+
+
+if nargin < 3
+    error('Need to pass in map, start and goal');
+end
+
+if nargin < 4
+    deltaStep = 10;
+end
+fprintf('Deltastep = %f \n',deltaStep);
+
+% Figure
+fg = figure(101); hold on;
+imagesc(envmap); 
+t1 = text(start(1), start(2), 'S'); set(t1,'Color','r','Fontsize',15);
+t2 = text(goal(1), goal(2), 'G'); set(t2,'Color','g','Fontsize',15);
+title('RRT planning');
+xlim([1,size(envmap,2)]);
+ylim([1,size(envmap,1)]);
+
+%% READ -> STUDENT TODO:
+% Implement RRT to find a collision free path. Note that the edges also
+% have to be collision-free, not just the nodes.
+%   a) Sample states at random 99% of time, with 1% probability sample the goal state
+%   b) Extend the graph by "deltaStep" steps from the nearest
+%   neighbour of the sample in the direction of the sample (along the
+%   straight line). If sample is within deltaStep distance, use it directly
+%   c) Approx. Collision checking for the (approx.) straight line path
+%   between two states can be done using the function "collcheckstline".
+%   This also returns the states along the straight line path.
+%   d) A state is an obstacle if:
+%       envmap(state(2), state(1)) = 1
+%      A state is free if:
+%       envmap(state(2), state(1)) = 0
+%   e) Run till you find a state on the graph rounding which you get the
+%   goal state
+%   f) Display the progression of the graph generation for RRT (figure fg).
+%   You can use the "plot" command in MATLAB to plot the edges of the graph
+%   as you build it.
+%   g) Use checkLimits.m to check for limits for the point robot. Round-off
+% states for collision checking.
+%   h) Once you have reached the goal state, you will need to backtrack to
+%   find the path from start to goal.
+% 
+% (x,y) = (col,row) in MATLAB sense
+% 
+ct = 0;
+
+mapSize = size(envmap); 
+rowSize = mapSize(1);
+colSize = mapSize(2);
+
+adjacencyList = [];
+nodeList = [start(1) start(2)];
+breakFlag = 0;
+
+while(1)
+    
+    nSize = size(nodeList);
+    nodeListSize = nSize(1);
+    
+    goalProb = randi([1 100]);
+    
+    
+    if goalProb == 1
+        for index = 1:nodeListSize
+            startGoal = [goal(1) goal(2)];
+            testNode = [nodeList(index, 1) nodeList(index,2)];
+            testX = nodeList(index, 1);
+            testY = nodeList(index, 2);
+            
+            if(distance(testX, testY, goal(1), goal(2)) < 10 && collcheckstline(envmap, testNode, startGoal))
+               adjacencyList = [adjacencyList; nodeList(index, 1) nodeList(index, 2) goal(1) goal(2)];
+               breakFlag = 1;
+               break
+            end
+        end  
+    end
+    
+    if breakFlag == 1
+        break
+    end
+    
+    % TODO: Run till goal is reached
+    % Sample random state (sample goal with 1% prob)
+    % Get Nearest Neighbour on graph (out of collision, within limits)
+    % Extend graph towards sample by deltaStep to get xnew (check for path collision)
+    % Add xnew to graph, do some display (intermittently)
+    % Check for reaching goal & repeat
+    randX = randi([1 colSize]);
+    randY = randi([1 rowSize]);
+    
+    x = 1;
+    y = 1;
+    
+    minDistance = distance(1, 1, rowSize, colSize);
+    for index = 1:nodeListSize
+        testDist = distance(nodeList(index,1), nodeList(index,2), randX, randY);
+        if(testDist <= minDistance)
+            x = nodeList(index, 1);
+            y = nodeList(index, 2);
+            minDistance = testDist;
+        end
+    end
+    
+    dist = round(distance(x, y, randX, randY));
+    
+    while dist > deltaStep
+        randX = (x + randX)/2;
+        randY = (y + randY)/2;
+        dist = round(distance(x,y, randX, randY));
+    end   
+        
+    for k = 1:nodeListSize
+        if nodeList(k,1) == randX && nodeList(k,2) == randY
+            continue
+        end
+    end
+    
+    
+    startPoint = [x y];
+    endPoint = [randX randY];
+    if not(collcheckstline(envmap,startPoint, endPoint))
+        continue;
+    end
+    disp(randX);
+    disp(randY);
+    t3 = plot([x randX], [y randY]); set(t3, 'Color', 'r'); set(t3, 'Linewidth', 2); 
+    
+    adjacencyList = [adjacencyList; x y randX randY];
+    nodeList = [nodeList; randX randY;];    
+
+    % Display intermittently - assumes that student plots the graph
+    if ~mod(ct,200)
+        figure(fg);
+        drawnow;
+    end
+    
+    % Increment counter
+    ct = ct+1; 
+end
+
+% TODO: Backtrack to find the path between start & goal as well as the cost of the path
+% You need to set variables fpath & cost
+
+adjSize = size(adjacencyList);
+adjRowSize = adjSize(1);
+
+fpath = [adjacencyList(adjRowSize, 3) adjacencyList(adjRowSize, 4) adjacencyList(adjRowSize, 1) adjacencyList(adjRowSize, 2)];
+backIndex = 1;
+
+for index = adjRowSize: -1: 1
+    if (fpath(backIndex, 3) == adjacencyList(index, 3) && fpath(backIndex, 4) == adjacencyList(index, 4))
+        fpath = [fpath; adjacencyList(index, 3) adjacencyList(index, 4) adjacencyList(index, 1) adjacencyList(index, 2);];
+        backIndex = backIndex + 1;    
+    end
+end
+
+traceSize = size(fpath);
+
+for index = 1: traceSize(1)
+    en = plot([fpath(index, 1) fpath(index, 3)], [fpath(index, 2) fpath(index, 4)]); set(en, 'Color', 'w'); set(en, 'Linewidth', 2);
+end
+% Draw a final time before exiting
+figure(fg);
+plot(fpath(:,1), fpath(:,2), 'k.-', 'Linewidth',2);
+drawnow;
+
+end

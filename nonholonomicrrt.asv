@@ -175,21 +175,19 @@ while(1)
     
 
     dist = distance([x y], [randX randY]);
-    %Make sure the rand points are within 10 of nodeList nodes
-    while dist > deltastep
-       randX = (randX + x)/2 
-       randY = (randY + y)/2 
-       dist = distance([x y], [randX, randY);
-    end
-    
+
     nNeighbor = [x y t];
+    miniumD = distance([1 1], [400 400]);
+    minAngleDist = 360;
     for k = 1:25
        [xnew, isValid, rollout] = simulate_carBot(data, nNeighbor, randState, deltastep, maxlinearvel, maxsteerangle);
-                                  %simulate_carBot(data, xnear, xrand, deltastep, linearvel, steerangl) 
-       disp(xnew);
-        disp(isValid);
-        disp(rollout);
-    
+        if not(isValid)
+           continue
+        end
+        if mininum > distance([nNeighbor(1) nNeighbor(2)], [xnew(1) xnew(2)] && minAngleDist > angle
+            
+        end
+        
     end
     
     % Update figure - assumes student does something interesting to display

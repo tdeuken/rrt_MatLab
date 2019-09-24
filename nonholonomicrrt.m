@@ -172,22 +172,31 @@ while(1)
         end
     end
     
-    
-
-    dist = distance([x y], [randX randY]);
-
+   
     nNeighbor = [x y t];
+    minium= distance([1 1], [400 400]);
+    minAngleDist = 360;
+    cRollOut = [];
+    
     for k = 1:25
        [xnew, isValid, rollout] = simulate_carBot(data, nNeighbor, randState, deltastep, maxlinearvel, maxsteerangle);
-
+        if not(isValid)
+           continue
+        end
+        if minium > distance([nNeighbor(1) nNeighbor(2)], [xnew(1) xnew(2)]) && minAngleDist > abs(angdiff(nNeighbor(3), xnew(3)))
+            cRollout = rollout;
+        end
+        
     end
+    %Append xnew to nodeList
+    %Append all rollouts to Adj List
+    disp(cRollout);
     
     % Update figure - assumes student does something interesting to display
     if(~mod(ct,150))
         figure(fg);
         drawnow;
-    end
-    
+    end    
     % Increment counter
     ct = ct+1;
 end

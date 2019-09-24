@@ -175,11 +175,21 @@ while(1)
     
 
     dist = distance([x y], [randX randY]);
-
+    %Make sure the rand points are within 10 of nodeList nodes
+    while dist > deltastep
+       randX = (randX + x)/2 
+       randY = (randY + y)/2 
+       dist = distance([x y], [randX, randY);
+    end
+    
     nNeighbor = [x y t];
     for k = 1:25
        [xnew, isValid, rollout] = simulate_carBot(data, nNeighbor, randState, deltastep, maxlinearvel, maxsteerangle);
-
+                                  %simulate_carBot(data, xnear, xrand, deltastep, linearvel, steerangl) 
+       disp(xnew);
+        disp(isValid);
+        disp(rollout);
+    
     end
     
     % Update figure - assumes student does something interesting to display

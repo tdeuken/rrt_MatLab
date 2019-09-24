@@ -79,10 +79,11 @@ while(1)
         for index = 1:nodeListSize
             startGoal = [goal(1) goal(2)];
             testNode = [nodeList(index, 1) nodeList(index,2)];
-            testX = nodeList(index, 1);
-            testY = nodeList(index, 2);
+            goalNode = [goal(1) goal(2)]
+           
             
-            if(distance(testX, testY, goal(1), goal(2)) < 10 && collcheckstline(envmap, testNode, startGoal))
+            
+            if(distance(testNode, goalNode) < 10 && collcheckstline(envmap, testNode, startGoal))
                adjacencyList = [adjacencyList; nodeList(index, 1) nodeList(index, 2) goal(1) goal(2)];
                breakFlag = 1;
                break
@@ -106,7 +107,7 @@ while(1)
     x = 1;
     y = 1;
     
-    minDistance = distance(1, 1, rowSize, colSize);
+    minDistance = distance([1 1], [rowSize, colSize]);
     for index = 1:nodeListSize
         testDist = distance(nodeList(index,1), nodeList(index,2), randX, randY);
         if(testDist <= minDistance)
@@ -136,9 +137,8 @@ while(1)
     if not(collcheckstline(envmap,startPoint, endPoint))
         continue;
     end
-    disp(randX);
-    disp(randY);
-    t3 = plot(;
+  
+    t3 = plot([x randX], [y randY]); set(t3, 'Color', 'r'); set(t3, 'Linewidth', 2); 
     
     adjacencyList = [adjacencyList; x y randX randY];
     nodeList = [nodeList; randX randY;];    

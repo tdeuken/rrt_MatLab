@@ -25,17 +25,12 @@ function d = distance(a, b)
 % OUTPUT:
 % d - distance between states (scalar or (Nx1) vector)
 
-sizeT = size(a);
-distList = [];
+sizeT = size(a)
 
-if sizeT(1) > 1
-    for i = 1: sizeT(1)
-        d = sqrt((a(i, 1)-b(1))^2 + (a(i, 2)-b(2))^2);
-        distList = [distList; d]
-    end
-    
-    d = distList;
+if sizeT(a) > 1
+    d = sqrt((a(1)-b(1))^2 + (y-yy)^2);
 else
-    d = sqrt((a(1)-b(1))^2 + (a(2)-b(2))^2);
-%d = sqrt((x-xx)^2 + (y-yy)^2);
+
+d = sqrt((x-xx)^2 + (y-yy)^2);
+
 end

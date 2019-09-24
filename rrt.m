@@ -79,10 +79,11 @@ while(1)
         for index = 1:nodeListSize
             startGoal = [goal(1) goal(2)];
             testNode = [nodeList(index, 1) nodeList(index,2)];
-            testX = nodeList(index, 1);
-            testY = nodeList(index, 2);
+            goalNode = [goal(1) goal(2)]
+           
             
-            if(distance(testX, testY, goal(1), goal(2)) < 10 && collcheckstline(envmap, testNode, startGoal))
+            
+            if(distance(testNode, goalNode) < 10 && collcheckstline(envmap, testNode, startGoal))
                adjacencyList = [adjacencyList; nodeList(index, 1) nodeList(index, 2) goal(1) goal(2)];
                breakFlag = 1;
                break
@@ -106,9 +107,9 @@ while(1)
     x = 1;
     y = 1;
     
-    minDistance = distance(1, 1, rowSize, colSize);
+    minDistance = distance([1 1], [rowSize colSize]);
     for index = 1:nodeListSize
-        testDist = distance(nodeList(index,1), nodeList(index,2), randX, randY);
+        testDist = distance([nodeList(index,1) nodeList(index,2)], [randX randY]);
         if(testDist <= minDistance)
             x = nodeList(index, 1);
             y = nodeList(index, 2);
@@ -116,12 +117,12 @@ while(1)
         end
     end
     
-    dist = round(distance(x, y, randX, randY));
+    dist = round(distance([x y], [randX randY]));
     
     while dist > deltaStep
         randX = (x + randX)/2;
         randY = (y + randY)/2;
-        dist = round(distance(x,y, randX, randY));
+        dist = round(distance([x y], [randX randY]));
     end   
         
     for k = 1:nodeListSize

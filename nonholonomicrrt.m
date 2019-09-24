@@ -111,6 +111,9 @@ end
 % contents.
 
 ct = 0;
+nodeList = [start(1) start(2) start(3)];
+adjList = [];
+simulate_robot
 while(1)
     % TODO: Run till goal is reached
     % Sample state
@@ -127,8 +130,53 @@ while(1)
     randX = randi([1 400]);
     randY = randi([1 400]);
     randZ = randi([1 400]);
+    x = 1;
+    y = 2;
+    z = 3; 
+    
+    %Check if we are sampling Goal
+    goalProb = randi([1 100]);
+    if goalProb >= 1 && goalProb <= 10
+       for k = 1:nodeList
+          if dist3d(nodeList(k, 1), nodeList(k, 2), nodeList(k, 3), randX, randY, randZ) < 10
+             
+              %add to AdjList
+              break
+              
+          end
+       end
+    end
+    
+    %Check for duplicates
+    for k = 1: nodeList
+        if randX == nodeList(k, 1) && randY == nodeList(k, 2) && randZ == nodeList(k, 3)
+            continue
+        end
+    end
+    
+    minDist = dist3d(1 , 1, 1, 400, 400 ,400);
+    %find the closest node 
+    for k = 1: nodeList:
+        if minDist > dist3d(nodeList(1), nodeList(2), nodeList(3), randX, randY, randZ)
+           x = nodeList(1);
+           y = nodeList(2);
+           z = nodeList(3);
+           minDist = dist3d(nodeList(1), nodeList(2), nodeList(3), randX, randY, randZ);
+        end
+    end
+    
+    %Check for collisions
     
     
+    dist = dist3d(x, y, z, randX, randY, randZ);
+    %Make sure the rand points are within 10 of nodeList nodes
+    while dist > deltastep
+       randX = (randX + x)/2 
+       randY = (randY + Y)/2 
+       randZ = (randZ + Z)/2
+       
+       dist = dist3d(x, y, z, randX, randY, randZ);
+    end
     
     
     % Update figure - assumes student does something interesting to display

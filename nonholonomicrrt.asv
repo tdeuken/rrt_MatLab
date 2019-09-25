@@ -113,7 +113,6 @@ end
 ct = 0;
 nodeList = [start(1) start(2) start(3)];
 adjList = [];
-nodeListSize = size(nodeList)
 while(1)
     % TODO: Run till goal is reached
     % Sample state
@@ -139,7 +138,7 @@ while(1)
     goalProb = randi([1 100]);
     if goalProb >= 1 && goalProb <= 10
        for k = 1:nodeListSize
-          if dist3d(nodeList(k, 1), nodeList(k, 2), randX, randY) < 10
+          if distance([nodeList(k, 1) nodeList(k, 2)], [goal(1) goal(2)]) < 10
              
               %add to AdjList
               break
@@ -147,12 +146,14 @@ while(1)
           end
        end
     end
+    
     randState = [randX, randY, randT];
     %Check for collisions
-    if not(checkCollision_carBot(data, randState))
+    if checkCollision_carBot(data, randState)
         continue
     end
     
+    nodeListSize = size(nodeList);    
     %Check for duplicates
     for k = 1: nodeListSize
         if randX == nodeList(k, 1) && randY == nodeList(k, 2) && randT == nodeList(k, 3)
@@ -162,40 +163,76 @@ while(1)
     
     minDist = distance([1 1], [400 400]);
     minAngleDist = 360;
+    
     %find the closest node 
     for k = 1: nodeListSize(1)
-        if minDist > distance([nodeList(1) nodeList(2)], [randX randY]) && minAngleDist > abs(angdiff(t, randT))
-           x = nodeList(1);
-           y = nodeList(2);
+        if minDist > distance([nodeList(k, 1) nodeList(k, 2)], [randX randY]) && minAngleDist > abs(angdiff(nodeList(k, 3), randT))
+           x = nodeList(k, 1);
+           y = nodeList(k, 2);
+           t = nodeList(k, 3);
            minDist = distance([nodeList(1) nodeList(2)], [randX randY]);
-           minAngleDist = abs(angdiff(t, randT));
+           minAngleDist = abs(angdiff(nodeList(k, 3), randT));
         end
     end
     
-    
-
-    dist = distance([x y], [randX randY]);
-
+   
     nNeighbor = [x y t];
-    miniumD = distance([1 1], [400 400]);
-    minAngleDist = 360;
-    for k = 1:25
-       [xnew, isValid, rollout] = simulate_carBot(data, nNeighbor, randState, deltastep, maxlinearvel, maxsteerangle);
+    minimum= distance([1 1], [400 400]);
+    minAngleDist = randT;
+    cRollOut = [];
+    newNode = [];
+    
+    for k = 1:numcontrolsamples
+        maxSteer = (maxsteerangle * 10);
+        sampleSteerAngle = (randi([-maxSteer maxSteer]))/10.0;
+  
+        sampleLinearVel = randi([-maxlinearvel maxlinearvel]);
+        
+        
+       [xnew, isValid, rollout] = simulate_carBot(data, nNeighbor, randState, deltastep, sampleLinearVel, sampleSteerAngle);
         if not(isValid)
            continue
         end
-        if mininum > distance([nNeighbor(1) nNeighbor(2)], [xnew(1) xnew(2)] && minAngleDist > angle
-            
+        rolloutSize = size(rollout);
+        if rolloutSize(1) <= 1
+           continue 
+        end
+        disp(distance([randState(1) randState(2)], [xnew(1) xnew(2)]));
+        disp(abs(angdiff(randState(3), xnew(3))));
+        disp(angdiff(randState(3), xnew(3)));
+       
+        if minimum > distance([randState(1) randState(2)], [xnew(1) xnew(2)]) && minAngleDist+10 >= abs(angdiff(randState(3), xnew(3))) && minAngleDist-10 <= abs(angdiff(randState(3), xnew(3)))
+            newNode = xnew;
+            cRollOut = rollout;
+            minimum = distance([randState(1) randState(2)], [xnew(1) xnew(2)]);
+            minAngleDist = abs(angdiff(randState(3), xnew(3)));
         end
         
     end
+    %Append xnew to nodeList
+    %Append all rollouts to Adj List
+    nodeList = [nodeList; newNode];
+    
+    %Make AdjList
+    adjList = [];
+    adjListTemp = [];
+    cRollSize = size(cRollOut);
+    for k = 1: cRollSize(1) -1
+        adjListTemp = [cRollOut(k, 1) cRollOut(k, 2) cRollOut(k, 3) cRollOut(k+1, 1) cRollOut(k+1, 2) cRollOut(k+1, 3)];
+        adjList = [adjList; adjListTemp];
+    end
+    adjSize = size(adjList);
+    for k = 1: adjSize
+        t3 = plot([adjList(k, 1) adjList(k, 4)], [adjList(k, 2) adjList(k,5)]);  set(t3, 'Color', 'r'); set(t3, 'Linewidth', 2); 
+        %t1 = text(cRollOut(1), cRollOut(2), 'r*'); set(t1,'Color','r','Fontsize',20);
+    end
+
     
     % Update figure - assumes student does something interesting to display
     if(~mod(ct,150))
         figure(fg);
         drawnow;
-    end
-    
+    end    
     % Increment counter
     ct = ct+1;
 end

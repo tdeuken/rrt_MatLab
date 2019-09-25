@@ -18,7 +18,7 @@
 %can fit a function based on the cost of actual forward propagations you do. 
 %  c) You could also use the length of the car (= 7.5 cells in the current setup, 
 % check simulate_carBot.m) to better inform your distance metric. 
-function d = distance(a, b)
+function d = dist3d(a, b)
 % INPUT:
 % a - set of input poses [x,y,theta] => (N x 3), N can be >= 1
 % b - single pose [x,y,theta] => (1 x 3)
@@ -28,14 +28,8 @@ function d = distance(a, b)
 sizeT = size(a);
 distList = [];
 
-if sizeT(1) > 1
-    for i = 1: sizeT(1)
-        d = sqrt((a(i, 1)-b(1))^2 + (a(i, 2)-b(2))^2);
-        distList = [distList; d];
-    end
-    
-    d = distList;
-else
-    d = sqrt((a(1)-b(1))^2 + (a(2)-b(2))^2);
-%d = sqrt((x-xx)^2 + (y-yy)^2);
+
+for i = 1: sizeT(1)
+    d = sqrt((a(i, 1)-b(1))^2 + (a(i, 2)-b(2))^2+ (sqrt(a(i, 1)+b(1))*tan(diff)));
+    distList = [distList; d];
 end

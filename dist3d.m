@@ -32,6 +32,14 @@ distList = [];
 
 %minAngle = 7.5*(min((a(3)-b(3)), min((a(3)-b(3)+2*pi), (a( 3)-b(3)-2*pi))))^2;
 %minAngle = abs(angdiff(a(3), b(3)));
-d = sqrt((a(1)-b(1))^2 + (a(2)-b(2))^2 + (a(3)-b(3))^2);
+thetaThres = abs(angdiff(a(3), b(3)));
+minAngle = 0;
+if thetaThres > 100
+    minAngle = 1000;
+else
+    minAngle = (a(3)-b(3))^2;
+end
+
+d = sqrt((a(1)-b(1))^2 + (a(2)-b(2))^2 + minAngle);
 
 

@@ -140,7 +140,8 @@ while(1)
     goalProb = randi([1 100]);
     if goalProb >= 1 && goalProb <= 10
        for k = 1:nodeListSize
-           if distance([nodeList(k, 1) nodeList(k, 2)], [goal(1) goal(2)]) < 10 && 10 > abs(angdiff(goal(2), nodeList(k, 3)))
+           if dist3d([nodeList(k, 1) nodeList(k, 2) nodeList(k, 3)], [goal(1) goal(2) goal(3)]) < 10
+               %distance([nodeList(k, 1) nodeList(k, 2)], [goal(1) goal(2)]) < 10 && 10 > abs(angdiff(goal(2), nodeList(k, 3)))
                adjList = [adjList; nodeList(k, 1) nodeList(k, 2) nodeList(k, 3) goal(1) goal(2) goal(3)];
                endFlag = 1;
               %add to AdjList

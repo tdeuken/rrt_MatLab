@@ -113,6 +113,7 @@ end
 ct = 0;
 nodeList = [start(1) start(2) start(3)];
 adjList = [];
+fprintf('Start time %s\n', datestr(now, 'MM:SS.FFF'));
 
 while(1)
     % TODO: Run till goal is reached
@@ -243,7 +244,8 @@ for index = adjRowSize-1: -1: 1
         fPointer = fPointer + 1;
    end
 end
-disp(fpath);
+fprintf('Ending time %s\n', datestr(now, 'MM:SS.FFF'));
+
 %% Nothing to do here - Display path
 % Check that the path is within bounds/collision free
 for k = 1:size(fpath,1)

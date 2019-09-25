@@ -66,6 +66,7 @@ colSize = mapSize(2);
 adjacencyList = [];
 nodeList = [start(1) start(2)];
 breakFlag = 0;
+fprintf('Ending time %s\n', datestr(now, 'MM:SS.FFF'));
 
 while(1)
     
@@ -79,7 +80,7 @@ while(1)
         for index = 1:nodeListSize
             startGoal = [goal(1) goal(2)];
             testNode = [nodeList(index, 1) nodeList(index,2)];
-            goalNode = [goal(1) goal(2)]
+            goalNode = [goal(1) goal(2)];
            
             
             
@@ -170,10 +171,14 @@ for index = adjRowSize: -1: 1
 end
 
 traceSize = size(fpath);
-
+cost = 0;
 for index = 1: traceSize(1)
     en = plot([fpath(index, 1) fpath(index, 3)], [fpath(index, 2) fpath(index, 4)]); set(en, 'Color', 'w'); set(en, 'Linewidth', 2);
+    cost = cost + distance([fpath(index, 1) fpath(index, 2)], [fpath(index, 3) fpath(index, 4)]);
 end
+
+fprintf('Ending time %s\n', datestr(now, 'MM:SS.FFF'));
+
 % Draw a final time before exiting
 figure(fg);
 plot(fpath(:,1), fpath(:,2), 'k.-', 'Linewidth',2);

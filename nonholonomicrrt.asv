@@ -113,6 +113,7 @@ end
 ct = 0;
 nodeList = [start(1) start(2) start(3)];
 adjList = [];
+
 while(1)
     % TODO: Run till goal is reached
     % Sample state
@@ -128,18 +129,21 @@ while(1)
     % Check for reaching goal & repeat
     randX = randi([1 400]);
     randY = randi([1 400]);
-    randT = randi([-180 180]);
-    
+    randT = randi([0 360]);
+
     x = 1;
     y = 1;
     t = 1;
-    
+    endFlag = 0;
     %Check if we are sampling Goal
     goalProb = randi([1 100]);
     if goalProb >= 1 && goalProb <= 10
        for k = 1:nodeListSize
-          if distance([nodeList(k, 1) nodeList(k, 2)], [goal(1) goal(2)]) < 10
-             
+           disp(distance([nodeList(k, 1) nodeList(k, 2)], [goal(1) goal(2)]));
+           disp(abs(angdiff(goal(2), nodeList(k, 3))))
+           if distance([nodeList(k, 1) nodeList(k, 2)], [goal(1) goal(2)]) < 7.5 && 2.5 > abs(angdiff(goal(2), nodeList(k, 3)))
+               adjList = [adjList; nodeList(k, 1) nodeList(k, 2) nodeList(k, 3) goal(1) goal(2) goal(3)];
+               endFlag = 1;
               %add to AdjList
               break
               
@@ -147,6 +151,9 @@ while(1)
        end
     end
     
+    if endFlag == 1
+        break
+    end
     randState = [randX, randY, randT];
     %Check for collisions
     if checkCollision_carBot(data, randState)
@@ -155,37 +162,33 @@ while(1)
     
     nodeListSize = size(nodeList);    
     %Check for duplicates
-    for k = 1: nodeListSize
-        if randX == nodeList(k, 1) && randY == nodeList(k, 2) && randT == nodeList(k, 3)
-            continue
-        end
-    end
+%     for k = 1: nodeListSize
+%         if randX == nodeList(k, 1) && randY == nodeList(k, 2) && randT == nodeList(k, 3)
+%             continue
+%         end
+%     end
     
-    minDist = distance([1 1], [400 400]);
-    minAngleDist = 360;
+    minDist = 1000000000;
     
     %find the closest node 
     for k = 1: nodeListSize(1)
-        if minDist > distance([nodeList(k, 1) nodeList(k, 2)], [randX randY]) && minAngleDist > abs(angdiff(nodeList(k, 3), randT))
+        if minDist > dist3d([nodeList(k, 1) nodeList(k, 2) nodeList(k, 3)], [randX randY randT])
            x = nodeList(k, 1);
            y = nodeList(k, 2);
            t = nodeList(k, 3);
-           minDist = distance([nodeList(1) nodeList(2)], [randX randY]);
-           minAngleDist = abs(angdiff(nodeList(k, 3), randT));
+           minDist = dist3d([nodeList(k, 1) nodeList(k, 2) nodeList(k, 3)], [randX randY randT]);
         end
     end
     
    
     nNeighbor = [x y t];
-    minimum= distance([1 1], [400 400]);
-    minAngleDist = randT;
+    minimum= dist3d([1 1 0], [400 400 360]);
     cRollOut = [];
     newNode = [];
-    
+ 
     for k = 1:numcontrolsamples
-        maxSteer = (maxsteerangle * 10);
-        sampleSteerAngle = (randi([-maxSteer maxSteer]))/10.0;
-  
+        maxSteer = randi([-maxsteerangle*1000 maxsteerangle*1000]);
+        sampleSteerAngle = maxSteer/1000;
         sampleLinearVel = randi([-maxlinearvel maxlinearvel]);
         
         
@@ -197,15 +200,11 @@ while(1)
         if rolloutSize(1) <= 1
            continue 
         end
-        disp(distance([randState(1) randState(2)], [xnew(1) xnew(2)]));
-        disp(abs(angdiff(randState(3), xnew(3))));
-        disp(angdiff(randState(3), xnew(3)));
-       
-        if minimum > distance([randState(1) randState(2)], [xnew(1) xnew(2)]) && minAngleDist+10 >= abs(angdiff(randState(3), xnew(3))) && minAngleDist-10 <= abs(angdiff(randState(3), xnew(3)))
+
+        if minimum > dist3d(randState, xnew)
             newNode = xnew;
             cRollOut = rollout;
-            minimum = distance([randState(1) randState(2)], [xnew(1) xnew(2)]);
-            minAngleDist = abs(angdiff(randState(3), xnew(3)));
+            minimum = dist3d([randState(1) randState(2) randState(3)], [xnew(1) xnew(2) xnew(3)]);
         end
         
     end
@@ -214,30 +213,34 @@ while(1)
     nodeList = [nodeList; newNode];
     
     %Make AdjList
-    adjList = [];
     adjListTemp = [];
     cRollSize = size(cRollOut);
     for k = 1: cRollSize(1) -1
         adjListTemp = [cRollOut(k, 1) cRollOut(k, 2) cRollOut(k, 3) cRollOut(k+1, 1) cRollOut(k+1, 2) cRollOut(k+1, 3)];
+        t3 = plot([adjListTemp(1) adjListTemp(4)], [adjListTemp(2) adjListTemp(5)]);  set(t3, 'Color', 'r'); set(t3, 'Linewidth', 2); 
         adjList = [adjList; adjListTemp];
     end
-    adjSize = size(adjList);
-    for k = 1: adjSize
-        t3 = plot([adjList(k, 1) adjList(k, 4)], [adjList(k, 2) adjList(k,5)]);  set(t3, 'Color', 'r'); set(t3, 'Linewidth', 2); 
-        %t1 = text(cRollOut(1), cRollOut(2), 'r*'); set(t1,'Color','r','Fontsize',20);
-    end
-
+    
     
     % Update figure - assumes student does something interesting to display
     if(~mod(ct,150))
-        figure(fg);
+%        figure(fg);
         drawnow;
     end    
     % Increment counter
     ct = ct+1;
 end
 
-
+adjLSize = size(adjList);
+fpath = [adjList(adjLSize(1), 4) adjList(adjLSize(1), 5) adjList(adjLSize(1), 6) adjList(adjLSize(1), 1) adjList(adjLSize(1), 2) adjList(adjLSize(1), 3)];
+fPointer = 1;
+adjRowSize = adjLSize(1);
+for index = adjRowSize-1: -1: 1
+   if fpath(fPointer, 1) == adjList(index, 4) && fpath(fPointer, 2) == adjList(index, 5) && fpath(fPointer, 3) == adjList(index, 6)
+        fpath = [fpath; adjList(index, 4) adjList(index, 5) adjList(index, 6) adjList(index, 1) adjList(index, 2) adjList(index, 3)];
+   end
+end
+disp(fpath);
 %% Nothing to do here - Display path
 % Check that the path is within bounds/collision free
 for k = 1:size(fpath,1)

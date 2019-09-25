@@ -28,8 +28,10 @@ function d = dist3d(a, b)
 sizeT = size(a);
 distList = [];
 
+%[distance(qn, q)]^2 = (qn.x-q.x)^2 + (qn.y-q.y)^2 + A*min[(qn.theta-q.theta), (qn.theta-q.theta+2*PI), (qn.theta-q.theta-2*PI)]^2   --------------------- (1)
 
-for i = 1: sizeT(1)
-    d = sqrt((a(i, 1)-b(1))^2 + (a(i, 2)-b(2))^2+ (sqrt(a(i, 1)+b(1))*tan(diff)));
-    distList = [distList; d];
-end
+%minAngle = 7.5*(min((a(3)-b(3)), min((a(3)-b(3)+2*pi), (a( 3)-b(3)-2*pi))))^2;
+%minAngle = abs(angdiff(a(3), b(3)));
+d = sqrt((a(1)-b(1))^2 + (a(2)-b(2))^2 + (a(3)-b(3))^2);
+
+
